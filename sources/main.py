@@ -1,7 +1,15 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QInputDialog, QDialogButtonBox
 import sys
 import sqlite3
+
+
+class CinemaTicketsSystemException(Exception):
+    pass
+
+
+class CinemaTicketsSystemFileBroken(CinemaTicketsSystemException):
+    pass
 
 
 class TicketsSystemStartWindow(QWidget):
@@ -16,16 +24,22 @@ class TicketsSystemStartWindow(QWidget):
         self.close()
 
     def create_system_clicked(self):
-        pass
+        self.new_window = CreateTicketsSystemWindow()
+        self.new_window.show()
+        self.close()
 
     def open_system_clicked(self):
         database_file = QFileDialog.getOpenFileName(
             self, 'Выбрать файл билетной системы', '',
             'Файл билетной системы (*.tsf);;Все файлы (*)')[0]
         if database_file:
-            self.hide()
-            self.tabwindow = TicketsSystemTabsWindow()
-            self.tabwindow.show()
+            try:
+                self.new_window = TicketsSystemTabsWindow(database_file)
+                self.new_window.show()
+                self.close()
+            except CinemaTicketsSystemFileBroken:
+                print('Файл системы поврежден или неопознан')
+                self.show()
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -80,15 +94,32 @@ class TicketsSystemStartWindow(QWidget):
     def retranslateUi(self, Form):
         _translate = QtCore.QCoreApplication.translate
         Form.setWindowTitle(_translate("Form", "Билетная система"))
-        self.open_system.setText(_translate("Form", "Открыть файл системы..."))
-        self.create_system.setText(_translate("Form", "Создать новую систему..."))
+        self.open_system.setText(_translate("Form", "Открыть файл системы"))
+        self.create_system.setText(_translate("Form", "Создать новую систему"))
         self.exit.setText(_translate("Form", "Выход"))
 
 
 class TicketsSystemTabsWindow(QWidget):
-    def __init__(self):
+    def __init__(self, database_file):
         super(TicketsSystemTabsWindow, self).__init__()
+
+        self.database_file = database_file
+        try:
+            self.database_connection = sqlite3.connect(self.database_file)
+            self.cursor = self.database_connection.cursor()
+            title = self.cursor.execute("""SELECT value FROM information
+                                            WHERE name = 'window_title'""").fetchone()[0]
+        except Exception:
+            raise CinemaTicketsSystemFileBroken
+
         self.setupUi(self)
+        self.setWindowTitle(str(title))
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.database_connection.close()
+        self.new_window = TicketsSystemStartWindow()
+        self.new_window.show()
+        self.close()
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -114,6 +145,82 @@ class TicketsSystemTabsWindow(QWidget):
         Form.setWindowTitle(_translate("Form", "Билетная система"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab), _translate("Form", "Tab 1"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("Form", "Tab 2"))
+
+
+class CreateTicketsSystemWindow(QWidget):
+    def __init__(self):
+        super(CreateTicketsSystemWindow, self).__init__()
+        self.setupUi(self)
+        self.btn.clicked.connect(self.button_clicked)
+
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(375, 150)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
+                                           QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
+        Form.setSizePolicy(sizePolicy)
+        Form.setMaximumSize(QtCore.QSize(375, 150))
+        self.verticalLayout = QtWidgets.QVBoxLayout(Form)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.label = QtWidgets.QLabel(Form)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
+                                           QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setObjectName("label")
+        self.horizontalLayout.addWidget(self.label)
+        self.error_label = QtWidgets.QLabel(Form)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
+                                           QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.error_label.sizePolicy().hasHeightForWidth())
+        self.error_label.setSizePolicy(sizePolicy)
+        self.error_label.setText("")
+        self.error_label.setObjectName("error_label")
+        self.horizontalLayout.addWidget(self.error_label)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.title_input = QtWidgets.QLineEdit(Form)
+        self.title_input.setMaxLength(255)
+        self.title_input.setObjectName("title_input")
+        self.verticalLayout.addWidget(self.title_input)
+        self.btn = QtWidgets.QPushButton(Form)
+        self.btn.setObjectName("btn")
+        self.verticalLayout.addWidget(self.btn)
+
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Новая билетная система"))
+        self.label.setText(_translate("Form", "Введите название новой системы:"))
+        self.btn.setText(_translate("Form", "Далее"))
+
+    def button_clicked(self):
+        system_name = self.title_input.text().strip()
+        check_result = self._check_system_name(system_name)
+        if check_result != '':
+            self.error_label.setText(check_result)
+        else:
+            self._create_new_system_file(system_name)
+
+    def _check_system_name(self, name: str) -> str:
+        if len(name) == 0:
+            return 'Название не может быть пустым'
+        if set('/\\?:*"\'<>|.') & set(name):
+            return 'Название системы не может содержать /\\?:*"\'<>.|'
+        return ''
+
+    def _create_new_system_file(self, filename: str) -> None:
+        pass
 
 
 if __name__ == '__main__':
