@@ -1,6 +1,7 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QInputDialog, QDialogButtonBox
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QPushButton
 import sys
+import os
 import sqlite3
 
 
@@ -28,18 +29,18 @@ class TicketsSystemStartWindow(QWidget):
         self.new_window.show()
         self.close()
 
-    def open_system_clicked(self):
-        database_file = QFileDialog.getOpenFileName(
-            self, 'Выбрать файл билетной системы', '',
-            'Файл билетной системы (*.tsf);;Все файлы (*)')[0]
-        if database_file:
-            try:
-                self.new_window = TicketsSystemTabsWindow(database_file)
-                self.new_window.show()
-                self.close()
-            except CinemaTicketsSystemFileBroken:
-                print('Файл системы поврежден или неопознан')
-                self.show()
+    def open_system_clicked(self, *args, database_file=None, **kwargs):
+        if database_file is None:
+            database_file = QFileDialog.getOpenFileName(
+                self, 'Выбрать файл билетной системы', '',
+                'Файл билетной системы (*.tsf);;Все файлы (*)')[0]
+        try:
+            self.new_window = TicketsSystemTabsWindow(database_file)
+            self.new_window.show()
+            self.close()
+        except CinemaTicketsSystemFileBroken:
+            print('Файл системы поврежден или неопознан')
+            self.show()
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -108,8 +109,13 @@ class TicketsSystemTabsWindow(QWidget):
             self.database_connection = sqlite3.connect(self.database_file)
             self.cursor = self.database_connection.cursor()
             title = self.cursor.execute("""SELECT value FROM information
-                                            WHERE name = 'window_title'""").fetchone()[0]
-        except Exception:
+                                            WHERE name = 'window_title'""").fetchone()
+            if title is tuple:
+                title = title[0]
+            elif title is None:
+                title = 'Билетная система'
+        except Exception as e:
+            print(e)
             raise CinemaTicketsSystemFileBroken
 
         self.setupUi(self)
@@ -210,7 +216,15 @@ class CreateTicketsSystemWindow(QWidget):
         if check_result != '':
             self.error_label.setText(check_result)
         else:
-            self._create_new_system_file(system_name)
+            files = list(os.walk(os.getcwd()))[0][2]
+            if system_name + '.tsf' in files:
+                mb = QtWidgets.QMessageBox
+                answer = mb.question(self, '', f'Файл {system_name + ".tsf"} уже есть. Заменить?',
+                                     mb.No | mb.Yes, mb.No)
+                if answer == mb.No:
+                    return
+
+            self.create_new_system_file(system_name)
 
     def _check_system_name(self, name: str) -> str:
         if len(name) == 0:
@@ -219,8 +233,62 @@ class CreateTicketsSystemWindow(QWidget):
             return 'Название системы не может содержать /\\?:*"\'<>.|'
         return ''
 
-    def _create_new_system_file(self, filename: str) -> None:
-        pass
+    def create_new_system_file(self, filename: str) -> None:
+        with open(filename + '.tsf', 'w', encoding='utf-8') as file:
+            pass
+        try:
+            self.connection = sqlite3.connect(filename + '.tsf')
+            self.cursor = self.connection.cursor()
+            self.cursor.executescript("""CREATE TABLE cinemas (
+    id      INTEGER      PRIMARY KEY AUTOINCREMENT
+                         UNIQUE
+                         NOT NULL,
+    name    STRING (255) UNIQUE
+                         NOT NULL,
+    address STRING (255) 
+);
+CREATE TABLE information (
+    name  STRING (255) PRIMARY KEY
+                       UNIQUE
+                       NOT NULL,
+    value TEXT (4096)  NOT NULL
+);
+CREATE TABLE sessions (
+    id             INTEGER      PRIMARY KEY AUTOINCREMENT
+                                UNIQUE
+                                NOT NULL,
+    name           STRING (255) NOT NULL,
+    date           DATE         NOT NULL,
+    time           TIME         NOT NULL,
+    duration       INTEGER      NOT NULL,
+    cinema_hall_id INTEGER      REFERENCES cinemahalls (id) 
+                                NOT NULL
+);
+CREATE TABLE plans (
+    id   INTEGER      PRIMARY KEY AUTOINCREMENT
+                      UNIQUE
+                      NOT NULL,
+    name STRING (255) UNIQUE
+                      NOT NULL,
+    data TEXT (4096)  NOT NULL
+);
+CREATE TABLE cinemahalls (
+    id        INTEGER      PRIMARY KEY AUTOINCREMENT
+                           UNIQUE
+                           NOT NULL,
+    name      STRING (255) NOT NULL,
+    plan_id   INTEGER      REFERENCES plans (id) 
+                           NOT NULL,
+    cinema_id INTEGER      REFERENCES cinemas (id) 
+                           NOT NULL
+);""")
+            self.connection.close()
+            self.new_window = TicketsSystemTabsWindow(filename + '.tsf')
+            self.new_window.show()
+
+            self.close()
+        except Exception as e:
+            print(e)
 
 
 if __name__ == '__main__':
