@@ -1,8 +1,11 @@
 from PyQt5 import QtWidgets, QtCore, QtGui
-from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QPushButton, QMainWindow
+from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QPushButton, QMainWindow, \
+    QTableWidgetItem
 import sys
 import os
 import sqlite3
+
+EXTENSION = '.tsf'
 
 
 class CreateTicketsSystemWindow(QWidget):
@@ -18,10 +21,10 @@ class CreateTicketsSystemWindow(QWidget):
             self.error_label.setText(check_result)
         else:
             files = list(os.walk(os.getcwd()))[0][2]
-            if system_name + '.tsf' in files:
+            if system_name + EXTENSION in files:
                 mb = QtWidgets.QMessageBox
                 answer = mb.question(self, '',
-                                     f'Файл {system_name + ".tsf"} уже есть. Заменить?',
+                                     f'Файл {system_name + EXTENSION} уже есть. Заменить?',
                                      mb.No | mb.Yes, mb.No)
                 if answer == mb.No:
                     return
@@ -36,7 +39,7 @@ class CreateTicketsSystemWindow(QWidget):
         return ''
 
     def create_new_system_file(self, filename: str) -> None:
-        filename += '.tsf'
+        filename += EXTENSION
         with open(filename, 'w', encoding='utf-8') as file:
             pass
         try:
@@ -84,6 +87,19 @@ CREATE TABLE cinemahalls (
                            NOT NULL,
     cinema_id INTEGER      REFERENCES cinemas (id) 
                            NOT NULL
+);
+CREATE TABLE tickets (
+    id        INTEGER      PRIMARY KEY AUTOINCREMENT
+                           UNIQUE
+                           NOT NULL,
+    date      DATE         NOT NULL,
+    time      TIME         NOT NULL,
+    cost      INTEGER      NOT NULL,
+    session_id   INTEGER   REFERENCES sessions (id) 
+                           NOT NULL,
+    cinema_id INTEGER      REFERENCES cinemas (id) 
+                           NOT NULL,
+    sit_id      INTEGER    NOT NULL
 );
 INSERT INTO information(name, value) VALUES ('window_title', '{filename[:-4]}');""")
             self.connection.close()
@@ -163,11 +179,19 @@ class TicketsSystemMainWindow(QMainWindow):
     def mode_change(self):
         current_mode = self.modes[self.mode_box.currentIndex()]
         print(current_mode)
+        result = list(self.cursor.execute(f"""SELECT name, address FROM {current_mode}"""))
+        if result:
+            self.table.setRowCount(0)
+            self.table.setColumnCount(len(result[0]))
+            for i, row in enumerate(result):
+                self.table.setRowCount(self.table.rowCount() + 1)
+                for j, col in enumerate(row):
+                    self.table.setItem(i, j, QTableWidgetItem(col))
 
     def open_system(self):
         self.database_file = QFileDialog.getOpenFileName(
             self, 'Выбрать файл билетной системы', '',
-            'Файл билетной системы (*.tsf);;Все файлы (*)')[0]
+            f'Файл билетной системы (*{EXTENSION});;Все файлы (*)')[0]
         try:
             self.database_connection = sqlite3.connect(self.database_file)
             self.cursor = self.database_connection.cursor()
@@ -180,7 +204,7 @@ class TicketsSystemMainWindow(QMainWindow):
                 title = 'Билетная система'
             self.setWindowTitle(str(title))
 
-            self.mode_box.setCurrentIndex(0)
+            self.mode_change()
 
         except Exception as e:
             self.information_label.setText(f'Файл системы {self.database_file} поврежден')
@@ -191,11 +215,14 @@ class TicketsSystemMainWindow(QMainWindow):
         self.new_window.show()
         self.close()
 
-    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+    def closeEvent(self, a0: QtGui.QCloseEvent):
         try:
             self.database_connection.close()
         except Exception:
             pass
+        self.close()
+
+    def close_program(self):
         self.close()
 
     def setupUi(self, MainWindow):
@@ -207,9 +234,11 @@ class TicketsSystemMainWindow(QMainWindow):
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.page_title = QtWidgets.QLabel(self.centralwidget)
-        self.page_title.setObjectName("page_title")
-        self.horizontalLayout.addWidget(self.page_title)
+
+        self.add_btn = QPushButton('Добавить...')
+        self.add_btn.setObjectName("add_btn")
+        self.horizontalLayout.addWidget(self.add_btn)
+
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
                                            QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
@@ -221,9 +250,9 @@ class TicketsSystemMainWindow(QMainWindow):
         self.mode_box.addItem("")
         self.horizontalLayout.addWidget(self.mode_box)
         self.verticalLayout.addLayout(self.horizontalLayout)
-        self.listWidget = QtWidgets.QListWidget(self.centralwidget)
-        self.listWidget.setObjectName("listWidget")
-        self.verticalLayout.addWidget(self.listWidget)
+        self.table = QtWidgets.QTableWidget(self.centralwidget)
+        self.table.setObjectName("listWidget")
+        self.verticalLayout.addWidget(self.table)
         self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_2.setObjectName("horizontalLayout_2")
         self.information_label = QtWidgets.QLabel(self.centralwidget)
@@ -252,6 +281,7 @@ class TicketsSystemMainWindow(QMainWindow):
 
         self.exit_btn = QtWidgets.QAction(MainWindow)
         self.exit_btn.setObjectName("exit_btn")
+        self.exit_btn.triggered.connect(self.close_program)
 
         self.action = QtWidgets.QAction(MainWindow)
         self.action.setObjectName("action")
@@ -284,7 +314,7 @@ class TicketsSystemMainWindow(QMainWindow):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Билетная система"))
-        self.page_title.setText(_translate("MainWindow", "TextLabel"))
+
         self.mode_box.setItemText(0, _translate("MainWindow", "Кинотеатры"))
         self.mode_box.setItemText(1, _translate("MainWindow", "Кинозалы"))
         self.mode_box.setItemText(2, _translate("MainWindow", "Сеансы"))
