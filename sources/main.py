@@ -9,160 +9,6 @@ import datetime as dt
 EXTENSION = '.sqlite3'
 
 
-class CreateTicketsSystemWindow(QWidget):
-    def __init__(self):
-        super(CreateTicketsSystemWindow, self).__init__()
-        self.setupUi(self)
-        self.btn.clicked.connect(self.button_clicked)
-
-    def button_clicked(self):
-        system_name = self.title_input.text().strip()
-        check_result = self._check_system_name(system_name)
-        if check_result != '':
-            self.error_label.setText(check_result)
-        else:
-            files = list(os.walk(os.getcwd()))[0][2]
-            if system_name + EXTENSION in files:
-                mb = QtWidgets.QMessageBox
-                answer = mb.question(self, '',
-                                     f'Файл {system_name + EXTENSION} уже есть. Заменить?',
-                                     mb.No | mb.Yes, mb.No)
-                if answer == mb.No:
-                    return
-
-            self.create_new_system_file(system_name)
-
-    def _check_system_name(self, name: str) -> str:
-        if len(name) == 0:
-            return 'Название не может быть пустым'
-        if set('/\\?:*"\'<>|.') & set(name):
-            return 'Название системы не может содержать /\\?:*"\'<>.|'
-        return ''
-
-    def create_new_system_file(self, filename: str) -> None:
-        filename += EXTENSION
-        with open(filename, 'w', encoding='utf-8') as file:
-            pass
-        try:
-            self.connection = sqlite3.connect(filename)
-            self.cursor = self.connection.cursor()
-            self.cursor.executescript(f"""CREATE TABLE cinemas (
-    id      INTEGER      PRIMARY KEY AUTOINCREMENT
-                         UNIQUE
-                         NOT NULL,
-    name    STRING (255) UNIQUE
-                         NOT NULL,
-    address STRING (255) 
-);
-CREATE TABLE information (
-    name  STRING (255) PRIMARY KEY
-                       UNIQUE
-                       NOT NULL,
-    value TEXT (4096)  NOT NULL
-);
-CREATE TABLE sessions (
-    id             INTEGER      PRIMARY KEY AUTOINCREMENT
-                                UNIQUE
-                                NOT NULL,
-    name           STRING (255) NOT NULL,
-    date           DATE         NOT NULL,
-    time           TIME         NOT NULL,
-    duration       INTEGER      NOT NULL,
-    cinema_hall_id INTEGER      REFERENCES cinemahalls (id) 
-                                NOT NULL
-);
-CREATE TABLE plans (
-    id   INTEGER      PRIMARY KEY AUTOINCREMENT
-                      UNIQUE
-                      NOT NULL,
-    name STRING (255) UNIQUE
-                      NOT NULL,
-    data TEXT (4096)  NOT NULL
-);
-CREATE TABLE cinemahalls (
-    id        INTEGER      PRIMARY KEY AUTOINCREMENT
-                           UNIQUE
-                           NOT NULL,
-    name      STRING (255) NOT NULL,
-    plan_id   INTEGER      REFERENCES plans (id) 
-                           NOT NULL,
-    cinema_id INTEGER      REFERENCES cinemas (id) 
-                           NOT NULL
-);
-CREATE TABLE tickets (
-    id        INTEGER      PRIMARY KEY AUTOINCREMENT
-                           UNIQUE
-                           NOT NULL,
-    date      DATE         NOT NULL,
-    time      TIME         NOT NULL,
-    cost      INTEGER      NOT NULL,
-    session_id   INTEGER   REFERENCES sessions (id) 
-                           NOT NULL,
-    cinema_id INTEGER      REFERENCES cinemas (id) 
-                           NOT NULL,
-    sit_id      INTEGER    NOT NULL
-);
-INSERT INTO information(name, value) VALUES ('window_title', '{filename[:-4]}');""")
-            self.connection.close()
-            self.new_window = TicketsSystemMainWindow(database_file=filename)
-            self.new_window.show()
-
-            self.close()
-        except Exception as e:
-            print(e)
-
-    def setupUi(self, Form):
-        Form.setObjectName("Form")
-        Form.resize(375, 150)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
-                                           QtWidgets.QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
-        Form.setSizePolicy(sizePolicy)
-        Form.setMaximumSize(QtCore.QSize(375, 150))
-        self.verticalLayout = QtWidgets.QVBoxLayout(Form)
-        self.verticalLayout.setObjectName("verticalLayout")
-        self.horizontalLayout = QtWidgets.QHBoxLayout()
-        self.horizontalLayout.setObjectName("horizontalLayout")
-        self.label = QtWidgets.QLabel(Form)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
-                                           QtWidgets.QSizePolicy.Maximum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy)
-        self.label.setObjectName("label")
-        self.horizontalLayout.addWidget(self.label)
-        self.error_label = QtWidgets.QLabel(Form)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
-                                           QtWidgets.QSizePolicy.Maximum)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.error_label.sizePolicy().hasHeightForWidth())
-        self.error_label.setSizePolicy(sizePolicy)
-        self.error_label.setText("")
-        self.error_label.setObjectName("error_label")
-        self.horizontalLayout.addWidget(self.error_label)
-        self.verticalLayout.addLayout(self.horizontalLayout)
-        self.title_input = QtWidgets.QLineEdit(Form)
-        self.title_input.setMaxLength(255)
-        self.title_input.setObjectName("title_input")
-        self.verticalLayout.addWidget(self.title_input)
-        self.btn = QtWidgets.QPushButton(Form)
-        self.btn.setObjectName("btn")
-        self.verticalLayout.addWidget(self.btn)
-
-        self.retranslateUi(Form)
-        QtCore.QMetaObject.connectSlotsByName(Form)
-
-    def retranslateUi(self, Form):
-        _translate = QtCore.QCoreApplication.translate
-        Form.setWindowTitle(_translate("Form", "Новая билетная система"))
-        self.label.setText(_translate("Form", "Введите название новой системы:"))
-        self.btn.setText(_translate("Form", "Далее"))
-
-
 class TicketsSystemMainWindow(QMainWindow):
     def __init__(self, database_file=None):
         super(TicketsSystemMainWindow, self).__init__()
@@ -178,16 +24,23 @@ class TicketsSystemMainWindow(QMainWindow):
             self.open_system()
 
     def mode_change(self):
-        current_mode = self.modes[self.mode_box.currentIndex()]
-        print(current_mode)
-        result = list(self.cursor.execute(f"""SELECT name, address FROM {current_mode}"""))
-        if result:
-            self.table.setRowCount(0)
-            self.table.setColumnCount(len(result[0]))
-            for i, row in enumerate(result):
-                self.table.setRowCount(self.table.rowCount() + 1)
-                for j, col in enumerate(row):
-                    self.table.setItem(i, j, QTableWidgetItem(col))
+        if self.database_file:
+            current_mode = self.mode_box.currentText()
+
+            queries = {'Кинотетары': ('name, address', ['Название', 'Адресс']),
+                       'Кинозалы': ('name, number', ['Название', 'Номер кинозала']),
+                       'Сеансы': ('name, number', ['Название', 'Номер кинозала']),
+                       'Касса': ('name, number', ['Название', 'Номер кинозала'])}
+            query = f'SELECT {queries[current_mode[0]]} FROM {current_mode}'
+            result = list(self.cursor.execute(query))
+            if result:
+                self.table.setRowCount(0)
+                self.table.setColumnCount(len(result[0]))
+                # self.table.setHorizontalHeaderLabels(queries[current_mode[1]])
+                for i, row in enumerate(result):
+                    self.table.setRowCount(self.table.rowCount() + 1)
+                    for j, col in enumerate(row):
+                        self.table.setItem(i, j, QTableWidgetItem(col))
 
     def open_system(self):
         self.database_file = QFileDialog.getOpenFileName(
@@ -329,6 +182,164 @@ class TicketsSystemMainWindow(QMainWindow):
         self.save_as_btn.setText(_translate("MainWindow", "Сохранить как..."))
         self.open_system_btn.setText(_translate("MainWindow", "Открыть систему"))
         self.create_new_system_btn.setText(_translate("MainWindow", "Создать систему"))
+
+
+class CreateTicketsSystemWindow(QWidget):
+    def __init__(self):
+        super(CreateTicketsSystemWindow, self).__init__()
+        self.setupUi(self)
+        self.btn.clicked.connect(self.button_clicked)
+
+    def button_clicked(self):
+        system_name = self.title_input.text().strip()
+        check_result = self._check_system_name(system_name)
+        if check_result != '':
+            self.error_label.setText(check_result)
+        else:
+            files = list(os.walk(os.getcwd()))[0][2]
+            if system_name + EXTENSION in files:
+                mb = QtWidgets.QMessageBox
+                answer = mb.question(self, '',
+                                     f'Файл {system_name + EXTENSION} уже есть. Заменить?',
+                                     mb.No | mb.Yes, mb.No)
+                if answer == mb.No:
+                    return
+
+            self.create_new_system_file(system_name)
+
+    def _check_system_name(self, name: str) -> str:
+        if len(name) == 0:
+            return 'Название не может быть пустым'
+        if set('/\\?:*"\'<>|.') & set(name):
+            return 'Название системы не может содержать /\\?:*"\'<>.|'
+        return ''
+
+    def create_new_system_file(self, filename: str) -> None:
+        filename += EXTENSION
+        with open(filename, 'w', encoding='utf-8'):
+            pass
+        try:
+            self.connection = sqlite3.connect(filename)
+            self.cursor = self.connection.cursor()
+            self.cursor.executescript(f"""CREATE TABLE cinemas (
+    id      INTEGER      PRIMARY KEY AUTOINCREMENT
+                         UNIQUE
+                         NOT NULL,
+    name    STRING (255) UNIQUE
+                         NOT NULL,
+    address STRING (255) 
+);
+CREATE TABLE information (
+    name  STRING (255) PRIMARY KEY
+                       UNIQUE
+                       NOT NULL,
+    value TEXT (4096)  NOT NULL
+);
+CREATE TABLE sessions (
+    id             INTEGER      PRIMARY KEY AUTOINCREMENT
+                                UNIQUE
+                                NOT NULL,
+    name           STRING (255) NOT NULL,
+    date           DATE         NOT NULL,
+    time           TIME         NOT NULL,
+    duration       INTEGER      NOT NULL,
+    cinema_hall_id INTEGER      REFERENCES cinemahalls (id) 
+                                NOT NULL
+);
+CREATE TABLE plans (
+    id   INTEGER      PRIMARY KEY AUTOINCREMENT
+                      UNIQUE
+                      NOT NULL,
+    name STRING (255) UNIQUE
+                      NOT NULL,
+    data TEXT (4096)  NOT NULL
+);
+CREATE TABLE cinemahalls (
+    id        INTEGER      PRIMARY KEY AUTOINCREMENT
+                           UNIQUE
+                           NOT NULL,
+    name      STRING (255) NOT NULL,
+    plan_id   INTEGER      REFERENCES plans (id) 
+                           NOT NULL,
+    cinema_id INTEGER      REFERENCES cinemas (id) 
+                           NOT NULL
+);
+CREATE TABLE tickets (
+    id        INTEGER      PRIMARY KEY AUTOINCREMENT
+                           UNIQUE
+                           NOT NULL,
+    date      DATE         NOT NULL,
+    time      TIME         NOT NULL,
+    cost      INTEGER      NOT NULL,
+    session_id   INTEGER   REFERENCES sessions (id) 
+                           NOT NULL,
+    cinema_id INTEGER      REFERENCES cinemas (id) 
+                           NOT NULL,
+    sit_id      INTEGER    NOT NULL
+);
+INSERT INTO information(name, value) VALUES ('window_title', '{filename[:filename.rfind('.')]}');""")
+            self.connection.close()
+            self.new_window = TicketsSystemMainWindow(database_file=filename)
+            self.new_window.show()
+
+            self.close()
+        except Exception as e:
+            print(e)
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.new_window = TicketsSystemMainWindow()
+        self.new_window.show()
+
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(375, 150)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
+                                           QtWidgets.QSizePolicy.Preferred)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(Form.sizePolicy().hasHeightForWidth())
+        Form.setSizePolicy(sizePolicy)
+        Form.setMaximumSize(QtCore.QSize(375, 150))
+        self.verticalLayout = QtWidgets.QVBoxLayout(Form)
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.label = QtWidgets.QLabel(Form)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
+                                           QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy)
+        self.label.setObjectName("label")
+        self.horizontalLayout.addWidget(self.label)
+        self.error_label = QtWidgets.QLabel(Form)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Preferred,
+                                           QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.error_label.sizePolicy().hasHeightForWidth())
+        self.error_label.setSizePolicy(sizePolicy)
+        self.error_label.setText("")
+        self.error_label.setObjectName("error_label")
+        self.horizontalLayout.addWidget(self.error_label)
+        self.verticalLayout.addLayout(self.horizontalLayout)
+        self.title_input = QtWidgets.QLineEdit(Form)
+        self.title_input.setMaxLength(255)
+        self.title_input.setObjectName("title_input")
+        self.verticalLayout.addWidget(self.title_input)
+        self.btn = QtWidgets.QPushButton(Form)
+        self.btn.setObjectName("btn")
+        self.verticalLayout.addWidget(self.btn)
+
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Новая билетная система"))
+        self.label.setText(_translate("Form", "Введите название новой системы:"))
+        self.btn.setText(_translate("Form", "Далее"))
 
 
 if __name__ == '__main__':
