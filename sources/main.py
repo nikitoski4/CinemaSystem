@@ -4,8 +4,9 @@ from PyQt5.QtWidgets import QApplication, QWidget, QFileDialog, QPushButton, QMa
 import sys
 import os
 import sqlite3
+import datetime as dt
 
-EXTENSION = '.tsf'
+EXTENSION = '.sqlite3'
 
 
 class CreateTicketsSystemWindow(QWidget):
@@ -227,7 +228,7 @@ class TicketsSystemMainWindow(QMainWindow):
 
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(739, 503)
+        MainWindow.resize(740, 500)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
