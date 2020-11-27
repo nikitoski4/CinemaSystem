@@ -6,13 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-<<<<<<< HEAD
-    <width>1067</width>
-    <height>633</height>
-=======
     <width>1224</width>
     <height>699</height>
->>>>>>> master
    </rect>
   </property>
   <property name="windowTitle">
@@ -29,11 +24,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-<<<<<<< HEAD
-       <number>3</number>
-=======
        <number>1</number>
->>>>>>> master
       </property>
       <property name="movable">
        <bool>false</bool>
@@ -61,20 +52,13 @@
        <widget class="QLineEdit" name="lineEdit">
         <property name="geometry">
          <rect>
-<<<<<<< HEAD
-          <x>580</x>
-          <y>60</y>
-=======
           <x>890</x>
           <y>20</y>
->>>>>>> master
           <width>113</width>
           <height>20</height>
          </rect>
         </property>
        </widget>
-<<<<<<< HEAD
-=======
        <widget class="QComboBox" name="comboBox">
         <property name="geometry">
          <rect>
@@ -264,7 +248,6 @@
          <string>Поиск</string>
         </property>
        </widget>
->>>>>>> master
       </widget>
       <widget class="QWidget" name="tab_2">
        <attribute name="title">
@@ -994,13 +977,8 @@
     <rect>
      <x>0</x>
      <y>0</y>
-<<<<<<< HEAD
-     <width>1067</width>
-     <height>21</height>
-=======
      <width>1224</width>
      <height>26</height>
->>>>>>> master
     </rect>
    </property>
    <widget class="QMenu" name="menu">
