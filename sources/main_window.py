@@ -2,6 +2,7 @@ import os
 import sys
 import sqlite3
 import datetime
+from PyQt5.QtCore import QTime, QTimer, QDate
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, \
     QFileDialog, QInputDialog, QWidget, QLineEdit
@@ -68,6 +69,7 @@ CREATE TABLE tickets (
                            NOT NULL,
     sit_id      INTEGER    NOT NULL
 );"""
+PROGRAM_SECOND = 1000
 
 
 class Ui_MainWindow(object):
@@ -113,6 +115,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.label_4)
 
         self.tickets_date_start = QtWidgets.QDateEdit(self.tab_tickets)
+        self.tickets_date_start.setMinimumSize(80, 20)
         self.tickets_date_start.setAutoFillBackground(False)
         self.tickets_date_start.setWrapping(False)
         self.tickets_date_start.setReadOnly(False)
@@ -125,6 +128,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.addWidget(self.tickets_date_start)
 
         self.tickets_date_end = QtWidgets.QDateEdit(self.tab_tickets)
+        self.tickets_date_end.setMinimumSize(80, 20)
         self.tickets_date_end.setAutoFillBackground(False)
         self.tickets_date_end.setWrapping(False)
         self.tickets_date_end.setReadOnly(False)
@@ -302,6 +306,7 @@ class Ui_MainWindow(object):
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_2.addWidget(self.label_3)
         self.sessions_date_start = QtWidgets.QDateEdit(self.tab_sessions)
+        self.sessions_date_start.setMinimumSize(80, 20)
         self.sessions_date_start.setAutoFillBackground(False)
         self.sessions_date_start.setWrapping(False)
         self.sessions_date_start.setReadOnly(False)
@@ -312,6 +317,7 @@ class Ui_MainWindow(object):
         self.sessions_date_start.setObjectName("sessions_date_start")
         self.horizontalLayout_2.addWidget(self.sessions_date_start)
         self.sessions_date_end = QtWidgets.QDateEdit(self.tab_sessions)
+        self.sessions_date_end.setMinimumSize(80, 20)
         self.sessions_date_end.setAutoFillBackground(False)
         self.sessions_date_end.setWrapping(False)
         self.sessions_date_end.setReadOnly(False)
@@ -602,8 +608,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addWidget(self.label_current_date_and_time)
         self.current_time_edit = QtWidgets.QTimeEdit(self.centralwidget)
         self.current_time_edit.setObjectName("current_time_edit")
+
         self.horizontalLayout.addWidget(self.current_time_edit)
         self.current_date_edit = QtWidgets.QDateEdit(self.centralwidget)
+        self.current_date_edit.setCalendarPopup(True)
+        self.current_date_edit.setMinimumSize(80, 20)
         self.current_date_edit.setObjectName("current_date_edit")
         self.horizontalLayout.addWidget(self.current_date_edit)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -633,8 +642,13 @@ class Ui_MainWindow(object):
         self.action_exit = QtWidgets.QAction(MainWindow)
         self.action_exit.setObjectName("action_exit")
 
+        self.action_set_now_date_time = QtWidgets.QAction(MainWindow)
+        self.action_exit.setObjectName("action_set_now_date_time")
+
         self.menu.addAction(self.action_new_tickets_system)
         self.menu.addAction(self.action_open_tickets_system)
+        self.menu.addSeparator()
+        self.menu.addAction(self.action_set_now_date_time)
         self.menu.addSeparator()
         self.menu.addAction(self.action_rename_tickets_system)
         self.menu.addAction(self.action_exit)
@@ -930,6 +944,8 @@ class Ui_MainWindow(object):
         self.action_open_tickets_system.setText(_translate("MainWindow", "Открыть систему"))
         self.action_new_tickets_system.setText(_translate("MainWindow", "Создать систему"))
         self.action_exit.setText(_translate("MainWindow", "Выход"))
+        self.action_set_now_date_time.setText(_translate("MainWindow",
+                                                         "Установить текущее время и дату"))
         self.action_rename_tickets_system.setText(_translate("MainWindow", "Переименовать систему"))
 
 
@@ -941,12 +957,23 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
         self.action_open_tickets_system.triggered.connect(self.open_tickets_system)
         self.action_new_tickets_system.triggered.connect(self.create_tickets_system)
         self.action_rename_tickets_system.triggered.connect(self.rename_tickets_system)
+        self.action_set_now_date_time.triggered.connect(self.set_now_date_time)
         self.action_exit.triggered.connect(self.close_tickets_system)
 
         self.cinemas_btn_search_cinema.clicked.connect(self.cinemas_btn_search_clicked)
         self.cinemahalls_btn_search_hall.clicked.connect(self.cinemahalls_btn_search_clicked)
         self.plans_btn_search_plan.clicked.connect(self.plans_btn_search_clicked)
+        self.sessions_btn_show_result.clicked.connect(self.sessions_btn_search_clicked)
         self.plans_edit_search_method.clicked.connect(self.plans_btn_change_search_method_clicked)
+
+        self.reset_all_date_periods()
+
+        self.set_now_date_time()
+
+        self.timer = QTimer(self)
+        self.timer.start(PROGRAM_SECOND)
+        self.timer.timeout.connect(self.showtime)
+        self.showtime()
 
         self.label_information.setText('')
 
@@ -1055,7 +1082,16 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
 
     def sessions_btn_search_clicked(self):
         self.label_information.setText('')
-        pass
+        search_phrase = self.sessions_enter_search_phrase.text().strip()
+        query = f"""SELECT * FROM sessions """
+        if search_phrase:
+            query += f"WHERE name LIKE '%{search_phrase}%'"
+
+        try:
+            result = list(self.database_cursor.execute(query).fetchall())
+            self.fill_table_from_db_result(self.sessions_table, result)
+        except Exception:
+            pass
 
     def plans_btn_change_search_method_clicked(self):
         if self.plans_edit_search_method.text() == 'Название':
@@ -1081,6 +1117,40 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
             table.setRowCount(table.rowCount() + 1)
             for j, col in enumerate(row):
                 table.setItem(i, j, QTableWidgetItem(col))
+
+    def showtime(self):
+        program_time = self.current_time_edit.time()
+        program_date = self.current_date_edit.date()
+        combine = datetime.datetime.combine(datetime.date(program_date.year(),
+                                                          program_date.month(),
+                                                          program_date.day()),
+                                            datetime.time(program_time.hour(),
+                                                          program_time.minute(),
+                                                          program_time.second()))
+        # TODO
+        delta = datetime.timedelta(minutes=1)
+        combine = combine + delta
+        self.current_date_edit.setDate(QDate(combine.year,
+                                             combine.month,
+                                             combine.day))
+        self.current_time_edit.setTime(QTime(combine.hour,
+                                             combine.minute,
+                                             combine.second))
+
+    def set_now_date_time(self):
+        now = datetime.datetime.now()
+
+        self.current_time_edit.setTime(QTime(now.hour, now.minute, now.second))
+        self.current_date_edit.setDate(QDate(now.year, now.month, now.day))
+
+    def reset_all_date_periods(self):
+        now = datetime.datetime.now()
+        future = datetime.timedelta(days=30) + now
+        self.tickets_date_start.setDate(QDate(now.year, now.month, now.day))
+        self.tickets_date_end.setDate(QDate(future.year, future.month, future.day))
+
+        self.sessions_date_start.setDate(QDate(now.year, now.month, now.day))
+        self.sessions_date_end.setDate(QDate(future.year, future.month, future.day))
 
     def closeEvent(self, a0: QtGui.QCloseEvent):
         if self.database_connection is not None:
