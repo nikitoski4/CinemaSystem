@@ -17,8 +17,10 @@ class Ui_MainWindow(object):
         MainWindow.resize(1147, 654)
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
+
         self.tabWidget = QtWidgets.QTabWidget(self.centralwidget)
         self.tabWidget.setWhatsThis("")
         self.tabWidget.setAccessibleName("")
@@ -28,20 +30,29 @@ class Ui_MainWindow(object):
         self.tabWidget.setMovable(False)
         self.tabWidget.setTabBarAutoHide(False)
         self.tabWidget.setObjectName("tabWidget")
+
         self.tab_tickets = QtWidgets.QWidget()
         self.tab_tickets.setObjectName("tab_tickets")
+
         self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.tab_tickets)
         self.verticalLayout_5.setObjectName("verticalLayout_5")
+
         self.horizontalLayout_5 = QtWidgets.QHBoxLayout()
         self.horizontalLayout_5.setObjectName("horizontalLayout_5")
+
         self.label = QtWidgets.QLabel(self.tab_tickets)
         self.label.setObjectName("label")
+
         self.horizontalLayout_5.addWidget(self.label)
-        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                           QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem)
+
         self.label_4 = QtWidgets.QLabel(self.tab_tickets)
         self.label_4.setObjectName("label_4")
+
         self.horizontalLayout_5.addWidget(self.label_4)
+
         self.tickets_date_start = QtWidgets.QDateEdit(self.tab_tickets)
         self.tickets_date_start.setAutoFillBackground(False)
         self.tickets_date_start.setWrapping(False)
@@ -51,7 +62,9 @@ class Ui_MainWindow(object):
         self.tickets_date_start.setProperty("showGroupSeparator", False)
         self.tickets_date_start.setCalendarPopup(True)
         self.tickets_date_start.setObjectName("tickets_date_start")
+
         self.horizontalLayout_5.addWidget(self.tickets_date_start)
+
         self.tickets_date_end = QtWidgets.QDateEdit(self.tab_tickets)
         self.tickets_date_end.setAutoFillBackground(False)
         self.tickets_date_end.setWrapping(False)
@@ -61,12 +74,16 @@ class Ui_MainWindow(object):
         self.tickets_date_end.setProperty("showGroupSeparator", False)
         self.tickets_date_end.setCalendarPopup(True)
         self.tickets_date_end.setObjectName("tickets_date_end")
+
         self.horizontalLayout_5.addWidget(self.tickets_date_end)
+
         self.line_2 = QtWidgets.QFrame(self.tab_tickets)
         self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
         self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
         self.line_2.setObjectName("line_2")
+
         self.horizontalLayout_5.addWidget(self.line_2)
+
         self.tickets_tab_cinema_selector = QtWidgets.QComboBox(self.tab_tickets)
         self.tickets_tab_cinema_selector.setToolTip("")
         self.tickets_tab_cinema_selector.setToolTipDuration(-1)
@@ -79,15 +96,22 @@ class Ui_MainWindow(object):
         self.tickets_tab_cinema_selector.addItem("")
         self.tickets_tab_cinema_selector.addItem("")
         self.tickets_tab_cinema_selector.addItem("")
+
         self.horizontalLayout_5.addWidget(self.tickets_tab_cinema_selector)
+
         self.tickets_enter_search_phrase = QtWidgets.QLineEdit(self.tab_tickets)
         self.tickets_enter_search_phrase.setAlignment(QtCore.Qt.AlignCenter)
         self.tickets_enter_search_phrase.setObjectName("tickets_enter_search_phrase")
+
         self.horizontalLayout_5.addWidget(self.tickets_enter_search_phrase)
+
         self.tickets_btn_search = QtWidgets.QPushButton(self.tab_tickets)
         self.tickets_btn_search.setObjectName("tickets_btn_search")
+
         self.horizontalLayout_5.addWidget(self.tickets_btn_search)
+
         self.verticalLayout_5.addLayout(self.horizontalLayout_5)
+
         self.tickets_table = QtWidgets.QTableWidget(self.tab_tickets)
         self.tickets_table.setEditTriggers(QtWidgets.QAbstractItemView.NoEditTriggers)
         self.tickets_table.setAlternatingRowColors(True)
@@ -99,6 +123,7 @@ class Ui_MainWindow(object):
         self.tickets_table.setObjectName("tickets_table")
         self.tickets_table.setColumnCount(7)
         self.tickets_table.setRowCount(19)
+
         item = QtWidgets.QTableWidgetItem()
         self.tickets_table.setVerticalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
@@ -151,13 +176,16 @@ class Ui_MainWindow(object):
         self.tickets_table.setHorizontalHeaderItem(5, item)
         item = QtWidgets.QTableWidgetItem()
         self.tickets_table.setHorizontalHeaderItem(6, item)
+
         self.tickets_table.horizontalHeader().setVisible(False)
         self.tickets_table.horizontalHeader().setCascadingSectionResizes(False)
         self.tickets_table.horizontalHeader().setHighlightSections(True)
         self.tickets_table.horizontalHeader().setSortIndicatorShown(False)
         self.tickets_table.horizontalHeader().setStretchLastSection(True)
         self.tickets_table.verticalHeader().setVisible(False)
+
         self.verticalLayout_5.addWidget(self.tickets_table)
+
         self.tabWidget.addTab(self.tab_tickets, "")
         self.tab_cinemas = QtWidgets.QWidget()
         self.tab_cinemas.setObjectName("tab_cinemas")
@@ -174,7 +202,8 @@ class Ui_MainWindow(object):
         self.cinemas_btn_delete_cinema = QtWidgets.QPushButton(self.tab_cinemas)
         self.cinemas_btn_delete_cinema.setObjectName("cinemas_btn_delete_cinema")
         self.horizontalLayout_3.addWidget(self.cinemas_btn_delete_cinema)
-        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem1 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_3.addItem(spacerItem1)
         self.cinemas_enter_search_phrase = QtWidgets.QLineEdit(self.tab_cinemas)
         self.cinemas_enter_search_phrase.setInputMask("")
@@ -245,7 +274,8 @@ class Ui_MainWindow(object):
         self.sessions_btn_delete_session = QtWidgets.QPushButton(self.tab_sessions)
         self.sessions_btn_delete_session.setObjectName("sessions_btn_delete_session")
         self.horizontalLayout_2.addWidget(self.sessions_btn_delete_session)
-        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
         self.label_3 = QtWidgets.QLabel(self.tab_sessions)
         self.label_3.setObjectName("label_3")
@@ -372,7 +402,8 @@ class Ui_MainWindow(object):
         self.cinemahalls_btn_delete_hall = QtWidgets.QPushButton(self.tab_cinemahalls)
         self.cinemahalls_btn_delete_hall.setObjectName("cinemahalls_btn_delete_hall")
         self.horizontalLayout_4.addWidget(self.cinemahalls_btn_delete_hall)
-        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem3 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_4.addItem(spacerItem3)
         self.cinemahalls_enter_search_phrase = QtWidgets.QLineEdit(self.tab_cinemahalls)
         self.cinemahalls_enter_search_phrase.setInputMask("")
@@ -403,7 +434,7 @@ class Ui_MainWindow(object):
         item = QtWidgets.QTableWidgetItem()
         self.cinemahalls_table.setVerticalHeaderItem(2, item)
         item = QtWidgets.QTableWidgetItem()
-        item.setTextAlignment(QtCore.Qt.AlignLeading|QtCore.Qt.AlignVCenter)
+        item.setTextAlignment(QtCore.Qt.AlignLeading | QtCore.Qt.AlignVCenter)
         self.cinemahalls_table.setHorizontalHeaderItem(0, item)
         item = QtWidgets.QTableWidgetItem()
         self.cinemahalls_table.setHorizontalHeaderItem(1, item)
@@ -451,7 +482,8 @@ class Ui_MainWindow(object):
         self.plans_btn_delete_plan = QtWidgets.QPushButton(self.tab_plans)
         self.plans_btn_delete_plan.setObjectName("plans_btn_delete_plan")
         self.horizontalLayout_6.addWidget(self.plans_btn_delete_plan)
-        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem4 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_6.addItem(spacerItem4)
         self.plans_edit_search_method = QtWidgets.QPushButton(self.tab_plans)
         self.plans_edit_search_method.setObjectName("plans_edit_search_method")
@@ -541,7 +573,8 @@ class Ui_MainWindow(object):
         self.label_information = QtWidgets.QLabel(self.centralwidget)
         self.label_information.setObjectName("label_information")
         self.horizontalLayout.addWidget(self.label_information)
-        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding, QtWidgets.QSizePolicy.Minimum)
+        spacerItem5 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
+                                            QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout.addItem(spacerItem5)
         self.label_current_date_and_time = QtWidgets.QLabel(self.centralwidget)
         self.label_current_date_and_time.setObjectName("label_current_date_and_time")
@@ -585,12 +618,14 @@ class Ui_MainWindow(object):
         self.tickets_date_start.setStatusTip(_translate("MainWindow", "Дата начала"))
         self.tickets_date_end.setStatusTip(_translate("MainWindow", "Дата конца"))
         self.tickets_tab_cinema_selector.setStatusTip(_translate("MainWindow", "Выбрать кинотеатр"))
-        self.tickets_tab_cinema_selector.setItemText(0, _translate("MainWindow", "Выбрать кинотеатр"))
+        self.tickets_tab_cinema_selector.setItemText(0,
+                                                     _translate("MainWindow", "Выбрать кинотеатр"))
         self.tickets_tab_cinema_selector.setItemText(1, _translate("MainWindow", "Минотавр"))
         self.tickets_tab_cinema_selector.setItemText(2, _translate("MainWindow", "Крылья"))
         self.tickets_tab_cinema_selector.setItemText(3, _translate("MainWindow", "Луна"))
         self.tickets_enter_search_phrase.setStatusTip(_translate("MainWindow", "Строка поиска"))
-        self.tickets_enter_search_phrase.setPlaceholderText(_translate("MainWindow", "поиск по фильмам "))
+        self.tickets_enter_search_phrase.setPlaceholderText(
+            _translate("MainWindow", "поиск по фильмам "))
         self.tickets_btn_search.setStatusTip(_translate("MainWindow", "Найти подходящие сеансы"))
         self.tickets_btn_search.setText(_translate("MainWindow", "Поиск"))
         self.tickets_table.setSortingEnabled(True)
@@ -646,15 +681,19 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "New Column"))
         item = self.tickets_table.horizontalHeaderItem(6)
         item.setText(_translate("MainWindow", "New Column"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_tickets), _translate("MainWindow", "Касса"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_tickets),
+                                  _translate("MainWindow", "Касса"))
         self.cinemas_btn_add_cinema.setStatusTip(_translate("MainWindow", "Добавить кинотеатр"))
         self.cinemas_btn_add_cinema.setText(_translate("MainWindow", "Добавить"))
-        self.cinemas_btn_edit_cinema.setStatusTip(_translate("MainWindow", "Редактировать выделенный кинотеатр"))
+        self.cinemas_btn_edit_cinema.setStatusTip(
+            _translate("MainWindow", "Редактировать выделенный кинотеатр"))
         self.cinemas_btn_edit_cinema.setText(_translate("MainWindow", "Редактировать"))
-        self.cinemas_btn_delete_cinema.setStatusTip(_translate("MainWindow", "Удалить выделенный кинотеатр"))
+        self.cinemas_btn_delete_cinema.setStatusTip(
+            _translate("MainWindow", "Удалить выделенный кинотеатр"))
         self.cinemas_btn_delete_cinema.setText(_translate("MainWindow", "Удалить"))
         self.cinemas_enter_search_phrase.setStatusTip(_translate("MainWindow", "Строка поиска"))
-        self.cinemas_enter_search_phrase.setPlaceholderText(_translate("MainWindow", "поиск по кинотеатрам"))
+        self.cinemas_enter_search_phrase.setPlaceholderText(
+            _translate("MainWindow", "поиск по кинотеатрам"))
         self.cinemas_btn_search_cinema.setStatusTip(_translate("MainWindow", "Найти кинотеатры"))
         self.cinemas_btn_search_cinema.setText(_translate("MainWindow", "Поиск"))
         self.cinema_table.setSortingEnabled(True)
@@ -685,18 +724,22 @@ class Ui_MainWindow(object):
         item = self.cinema_table.item(2, 1)
         item.setText(_translate("MainWindow", "пр. Ленкома, 65"))
         self.cinema_table.setSortingEnabled(__sortingEnabled)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_cinemas), _translate("MainWindow", "Кинотеатры"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_cinemas),
+                                  _translate("MainWindow", "Кинотеатры"))
         self.sessions_btn_add_session.setStatusTip(_translate("MainWindow", "Добавить сеанс"))
         self.sessions_btn_add_session.setText(_translate("MainWindow", "Добавить"))
-        self.sessions_btn_edit_session.setStatusTip(_translate("MainWindow", "Редактировать выделенный сеанс"))
+        self.sessions_btn_edit_session.setStatusTip(
+            _translate("MainWindow", "Редактировать выделенный сеанс"))
         self.sessions_btn_edit_session.setText(_translate("MainWindow", "Редактировать"))
-        self.sessions_btn_delete_session.setStatusTip(_translate("MainWindow", "Удалить выделенный сеанс"))
+        self.sessions_btn_delete_session.setStatusTip(
+            _translate("MainWindow", "Удалить выделенный сеанс"))
         self.sessions_btn_delete_session.setText(_translate("MainWindow", "Удалить"))
         self.label_3.setText(_translate("MainWindow", "Временной период"))
         self.sessions_date_start.setStatusTip(_translate("MainWindow", "Дата начала"))
         self.sessions_date_end.setStatusTip(_translate("MainWindow", "Дата конца"))
         self.sessions_enter_search_phrase.setStatusTip(_translate("MainWindow", "Строка поиска"))
-        self.sessions_enter_search_phrase.setPlaceholderText(_translate("MainWindow", "поиск по фильмам"))
+        self.sessions_enter_search_phrase.setPlaceholderText(
+            _translate("MainWindow", "поиск по фильмам"))
         self.sessions_btn_show_result.setText(_translate("MainWindow", "Поиск"))
         self.sessions_table.setSortingEnabled(True)
         item = self.sessions_table.verticalHeaderItem(0)
@@ -758,15 +801,19 @@ class Ui_MainWindow(object):
         item = self.sessions_table.item(8, 5)
         item.setText(_translate("MainWindow", "ыуа"))
         self.sessions_table.setSortingEnabled(__sortingEnabled)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_sessions), _translate("MainWindow", "Сеансы"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_sessions),
+                                  _translate("MainWindow", "Сеансы"))
         self.cinemahalls_btn_add_hall.setStatusTip(_translate("MainWindow", "Добавить кинозал"))
         self.cinemahalls_btn_add_hall.setText(_translate("MainWindow", "Добавить"))
-        self.cinemahalls_btn_eidt_hall.setStatusTip(_translate("MainWindow", "Редактировать выделенный кинозал"))
+        self.cinemahalls_btn_eidt_hall.setStatusTip(
+            _translate("MainWindow", "Редактировать выделенный кинозал"))
         self.cinemahalls_btn_eidt_hall.setText(_translate("MainWindow", "Редактировать"))
-        self.cinemahalls_btn_delete_hall.setStatusTip(_translate("MainWindow", "Удалить выделенный кинозал"))
+        self.cinemahalls_btn_delete_hall.setStatusTip(
+            _translate("MainWindow", "Удалить выделенный кинозал"))
         self.cinemahalls_btn_delete_hall.setText(_translate("MainWindow", "Удалить"))
         self.cinemahalls_enter_search_phrase.setStatusTip(_translate("MainWindow", "Строка поиска"))
-        self.cinemahalls_enter_search_phrase.setPlaceholderText(_translate("MainWindow", "поиск по кинозалам"))
+        self.cinemahalls_enter_search_phrase.setPlaceholderText(
+            _translate("MainWindow", "поиск по кинозалам"))
         self.cinemahalls_btn_search_hall.setStatusTip(_translate("MainWindow", "Найти кинозалы"))
         self.cinemahalls_btn_search_hall.setText(_translate("MainWindow", "Поиск"))
         self.cinemahalls_table.setSortingEnabled(True)
@@ -805,17 +852,23 @@ class Ui_MainWindow(object):
         item = self.cinemahalls_table.item(2, 2)
         item.setText(_translate("MainWindow", "60"))
         self.cinemahalls_table.setSortingEnabled(__sortingEnabled)
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_cinemahalls), _translate("MainWindow", "Кинозалы"))
-        self.plans_btn_add_plan.setStatusTip(_translate("MainWindow", "Добавить планировку кинозала"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_cinemahalls),
+                                  _translate("MainWindow", "Кинозалы"))
+        self.plans_btn_add_plan.setStatusTip(
+            _translate("MainWindow", "Добавить планировку кинозала"))
         self.plans_btn_add_plan.setText(_translate("MainWindow", "Добавить"))
-        self.plans_btn_edit_plan.setStatusTip(_translate("MainWindow", "Редактировать выделенную планировку"))
+        self.plans_btn_edit_plan.setStatusTip(
+            _translate("MainWindow", "Редактировать выделенную планировку"))
         self.plans_btn_edit_plan.setText(_translate("MainWindow", "Редактировать"))
-        self.plans_btn_delete_plan.setStatusTip(_translate("MainWindow", "Удалить выделенную планировку"))
+        self.plans_btn_delete_plan.setStatusTip(
+            _translate("MainWindow", "Удалить выделенную планировку"))
         self.plans_btn_delete_plan.setText(_translate("MainWindow", "Удалить"))
-        self.plans_edit_search_method.setStatusTip(_translate("MainWindow", "Изменить критерий поиска"))
+        self.plans_edit_search_method.setStatusTip(
+            _translate("MainWindow", "Изменить критерий поиска"))
         self.plans_edit_search_method.setText(_translate("MainWindow", "Название"))
         self.plans_enter_search_phrase.setStatusTip(_translate("MainWindow", "Строка поиска"))
-        self.plans_enter_search_phrase.setPlaceholderText(_translate("MainWindow", "поиск по названию"))
+        self.plans_enter_search_phrase.setPlaceholderText(
+            _translate("MainWindow", "поиск по названию"))
         self.plans_btn_search_plan.setStatusTip(_translate("MainWindow", "Найти планировки"))
         self.plans_btn_search_plan.setText(_translate("MainWindow", "Поиск"))
         self.plans_table.setSortingEnabled(True)
@@ -871,7 +924,8 @@ class Ui_MainWindow(object):
         item.setText(_translate("MainWindow", "New Column"))
         item = self.plans_table.horizontalHeaderItem(6)
         item.setText(_translate("MainWindow", "New Column"))
-        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_plans), _translate("MainWindow", "Планировки"))
+        self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_plans),
+                                  _translate("MainWindow", "Планировки"))
         self.label_information.setText(_translate("MainWindow", "TextLabel"))
         self.label_current_date_and_time.setText(_translate("MainWindow", "Текущее время и дата"))
         self.menu.setTitle(_translate("MainWindow", "Файл"))
