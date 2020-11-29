@@ -1,7 +1,9 @@
 import os
 import sys
+import base64
 import sqlite3
 import datetime
+from PIL import Image
 from PyQt5.QtCore import QTime, QTimer, QDate
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.QtWidgets import QMainWindow, QApplication, QTableWidgetItem, \
@@ -109,6 +111,28 @@ class Ui_MainWindow(object):
                                            QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_5.addItem(spacerItem)
 
+        self.tickets_tab_cinema_selector = QtWidgets.QComboBox(self.tab_tickets)
+        self.tickets_tab_cinema_selector.setToolTip("")
+        self.tickets_tab_cinema_selector.setToolTipDuration(-1)
+        self.tickets_tab_cinema_selector.setWhatsThis("")
+        self.tickets_tab_cinema_selector.setAccessibleName("")
+        self.tickets_tab_cinema_selector.setAccessibleDescription("")
+        self.tickets_tab_cinema_selector.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
+        self.tickets_tab_cinema_selector.setObjectName("tickets_tab_cinema_selector")
+        self.tickets_tab_cinema_selector.addItem("")
+        self.tickets_tab_cinema_selector.addItem("")
+        self.tickets_tab_cinema_selector.addItem("")
+        self.tickets_tab_cinema_selector.addItem("")
+
+        self.horizontalLayout_5.addWidget(self.tickets_tab_cinema_selector)
+
+        self.line_2 = QtWidgets.QFrame(self.tab_tickets)
+        self.line_2.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line_2.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line_2.setObjectName("line_2")
+
+        self.horizontalLayout_5.addWidget(self.line_2)
+
         self.label_4 = QtWidgets.QLabel(self.tab_tickets)
         self.label_4.setObjectName("label_4")
 
@@ -146,21 +170,6 @@ class Ui_MainWindow(object):
         self.line_2.setObjectName("line_2")
 
         self.horizontalLayout_5.addWidget(self.line_2)
-
-        self.tickets_tab_cinema_selector = QtWidgets.QComboBox(self.tab_tickets)
-        self.tickets_tab_cinema_selector.setToolTip("")
-        self.tickets_tab_cinema_selector.setToolTipDuration(-1)
-        self.tickets_tab_cinema_selector.setWhatsThis("")
-        self.tickets_tab_cinema_selector.setAccessibleName("")
-        self.tickets_tab_cinema_selector.setAccessibleDescription("")
-        self.tickets_tab_cinema_selector.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
-        self.tickets_tab_cinema_selector.setObjectName("tickets_tab_cinema_selector")
-        self.tickets_tab_cinema_selector.addItem("")
-        self.tickets_tab_cinema_selector.addItem("")
-        self.tickets_tab_cinema_selector.addItem("")
-        self.tickets_tab_cinema_selector.addItem("")
-
-        self.horizontalLayout_5.addWidget(self.tickets_tab_cinema_selector)
 
         self.tickets_enter_search_phrase = QtWidgets.QLineEdit(self.tab_tickets)
         self.tickets_enter_search_phrase.setAlignment(QtCore.Qt.AlignCenter)
@@ -302,6 +311,28 @@ class Ui_MainWindow(object):
         spacerItem2 = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Expanding,
                                             QtWidgets.QSizePolicy.Minimum)
         self.horizontalLayout_2.addItem(spacerItem2)
+
+        self.sessions_tab_cinema_selector = QtWidgets.QComboBox(self.tab_sessions)
+        self.sessions_tab_cinema_selector.setToolTip("")
+        self.sessions_tab_cinema_selector.setToolTipDuration(-1)
+        self.sessions_tab_cinema_selector.setWhatsThis("")
+        self.sessions_tab_cinema_selector.setAccessibleName("")
+        self.sessions_tab_cinema_selector.setAccessibleDescription("")
+        self.sessions_tab_cinema_selector.setSizeAdjustPolicy(QtWidgets.QComboBox.AdjustToContents)
+        self.sessions_tab_cinema_selector.setObjectName("tickets_tab_cinema_selector")
+        self.sessions_tab_cinema_selector.addItem("")
+        self.sessions_tab_cinema_selector.addItem("")
+        self.sessions_tab_cinema_selector.addItem("")
+        self.sessions_tab_cinema_selector.addItem("")
+
+        self.horizontalLayout_2.addWidget(self.sessions_tab_cinema_selector)
+
+        self.line = QtWidgets.QFrame(self.tab_sessions)
+        self.line.setFrameShape(QtWidgets.QFrame.VLine)
+        self.line.setFrameShadow(QtWidgets.QFrame.Sunken)
+        self.line.setObjectName("line")
+        self.horizontalLayout_2.addWidget(self.line)
+
         self.label_3 = QtWidgets.QLabel(self.tab_sessions)
         self.label_3.setObjectName("label_3")
         self.horizontalLayout_2.addWidget(self.label_3)
@@ -673,6 +704,11 @@ class Ui_MainWindow(object):
         self.tickets_tab_cinema_selector.setItemText(1, _translate("MainWindow", "Минотавр"))
         self.tickets_tab_cinema_selector.setItemText(2, _translate("MainWindow", "Крылья"))
         self.tickets_tab_cinema_selector.setItemText(3, _translate("MainWindow", "Луна"))
+
+        self.sessions_tab_cinema_selector.setStatusTip(_translate("MainWindow", "Выбрать кинотеатр"))
+        self.sessions_tab_cinema_selector.setItemText(0,
+                                                      _translate("MainWindow", "Выбрать кинотеатр"))
+
         self.tickets_enter_search_phrase.setStatusTip(_translate("MainWindow", "Строка поиска"))
         self.tickets_enter_search_phrase.setPlaceholderText(
             _translate("MainWindow", "поиск по фильмам "))
@@ -965,6 +1001,7 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
         self.plans_btn_search_plan.clicked.connect(self.plans_btn_search_clicked)
         self.sessions_btn_show_result.clicked.connect(self.sessions_btn_search_clicked)
         self.plans_edit_search_method.clicked.connect(self.plans_btn_change_search_method_clicked)
+        self.cinemas_btn_add_cinema.clicked.connect(self.cinemas_btn_add_cinema_clicked)
 
         self.reset_all_date_periods()
 
@@ -1003,6 +1040,8 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
                     self.database_filename = database_temp_filename
 
                     self.load_all_data_from_database()
+
+                    self.update_all_combo_box()
 
                 except sqlite3.DatabaseError:
                     self.label_information.setText(
@@ -1044,12 +1083,23 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
     def cinemas_btn_search_clicked(self):
         self.label_information.setText('')
         search_phrase = self.cinemas_enter_search_phrase.text().strip()
-        query = f"""SELECT * FROM cinemas WHERE name LIKE '%{search_phrase}%'"""
+        query = f"""SELECT cinemas.name, cinemas.address, cinemahalls.name FROM cinemas 
+                             JOIN cinemahalls ON cinemas.id = cinemahalls.cinema_id 
+                                    WHERE cinemas.name LIKE '%{search_phrase}%'"""
         try:
             result = list(self.database_cursor.execute(query).fetchall())
+            cinema_halls = {}
+
+            for i in range(len(result)):
+                cinema_halls[tuple(result[i][:2])] = cinema_halls.get(tuple(result[i][:2]),
+                                                                      []) + [result[i][-1]]
+
+            result = [list(map(str,
+                               key)) + [', '.join(map(str,
+                                                      cinema_halls[key]))] for key in cinema_halls]
             self.fill_table_from_db_result(self.cinema_table, result, CINEMAS_TABLE_HEADERS)
-        except Exception:
-            pass
+        except Exception as e:
+            print(e)
 
     def cinemahalls_btn_search_clicked(self):
         self.label_information.setText('')
@@ -1096,7 +1146,7 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
     def plans_btn_change_search_method_clicked(self):
         if self.plans_edit_search_method.text() == 'Название':
             self.plans_enter_search_phrase.setPlaceholderText('поиск по вместимости')
-            self.plans_enter_search_phrase.setText('вместимость = 10')
+            self.plans_enter_search_phrase.setText('вместимость > 0')
             self.plans_edit_search_method.setText('Вместимость')
         else:
             self.plans_enter_search_phrase.setPlaceholderText('поиск по названию')
@@ -1151,6 +1201,22 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
 
         self.sessions_date_start.setDate(QDate(now.year, now.month, now.day))
         self.sessions_date_end.setDate(QDate(future.year, future.month, future.day))
+
+    def update_after_action(self):
+        self.update_all_combo_box()
+
+    def update_all_combo_box(self):
+        cinemas = list(self.database_cursor.execute("""SELECT name FROM cinemas""").fetchall())
+        self.tickets_tab_cinema_selector.clear()
+        self.tickets_tab_cinema_selector.addItem('Выбрать кинотеатр')
+        self.tickets_tab_cinema_selector.addItems(sorted([x[0] for x in cinemas]))
+
+        self.sessions_tab_cinema_selector.clear()
+        self.sessions_tab_cinema_selector.addItem('Выбрать кинотеатр')
+        self.sessions_tab_cinema_selector.addItems(sorted([x[0] for x in cinemas]))
+
+    def cinemas_btn_add_cinema_clicked(self):
+        pass
 
     def closeEvent(self, a0: QtGui.QCloseEvent):
         if self.database_connection is not None:
