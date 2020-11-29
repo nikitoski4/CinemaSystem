@@ -36,7 +36,7 @@
        <enum>QTabWidget::Rounded</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>4</number>
       </property>
       <property name="movable">
        <bool>false</bool>
@@ -1429,16 +1429,19 @@
      <x>0</x>
      <y>0</y>
      <width>1147</width>
-     <height>21</height>
+     <height>0</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">
     <property name="title">
      <string>Файл</string>
     </property>
-    <addaction name="action_exit"/>
+    <addaction name="action_3"/>
+    <addaction name="action_5"/>
     <addaction name="separator"/>
     <addaction name="action"/>
+    <addaction name="action_exit"/>
+    <addaction name="separator"/>
    </widget>
    <addaction name="menu"/>
   </widget>
@@ -1451,6 +1454,16 @@
   <action name="action">
    <property name="text">
     <string>Переименовать систему</string>
+   </property>
+  </action>
+  <action name="action_3">
+   <property name="text">
+    <string>Создать новую систему</string>
+   </property>
+  </action>
+  <action name="action_5">
+   <property name="text">
+    <string>Открыть систему</string>
    </property>
   </action>
  </widget>
