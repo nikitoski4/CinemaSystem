@@ -524,7 +524,6 @@ class Ui_MainWindow(object):
         self.cinemahalls_table.verticalHeader().setVisible(False)
         self.cinemahalls_table.verticalHeader().setStretchLastSection(False)
         self.verticalLayout_4.addWidget(self.cinemahalls_table)
-        self.tabWidget.addTab(self.tab_cinemahalls, "")
         self.tab_plans = QtWidgets.QWidget()
         self.tab_plans.setObjectName("tab_plans")
         self.verticalLayout_6 = QtWidgets.QVBoxLayout(self.tab_plans)
