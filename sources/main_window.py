@@ -1053,19 +1053,20 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
         self.creation_window.show()
 
     def rename_tickets_system(self):
-        new_name, ok_pressed = QInputDialog.getText(self, 'Переименовать систему',
-                                                    'Введите новое название билетной системы',
-                                                    QLineEdit.Normal, '')
-        if ok_pressed:
-            new_name = new_name.strip()
-            if len(new_name):
-                try:
-                    self.database_cursor.execute(f"""UPDATE information SET value = '{new_name}'
-                                                        WHERE name = 'window_title'""")
-                    self.database_connection.commit()
-                    self.setWindowTitle(new_name)
-                except Exception as e:
-                    print(e)
+        if self.database_connection:
+            new_name, ok_pressed = QInputDialog.getText(self, 'Переименовать систему',
+                                                        'Введите новое название билетной системы',
+                                                        QLineEdit.Normal, '')
+            if ok_pressed:
+                new_name = new_name.strip()
+                if len(new_name):
+                    try:
+                        self.database_cursor.execute(f"""UPDATE information SET value = '{new_name}'
+                                                            WHERE name = 'window_title'""")
+                        self.database_connection.commit()
+                        self.setWindowTitle(new_name)
+                    except Exception as e:
+                        print(e)
 
     def close_tickets_system(self):
         self.close()
@@ -1083,7 +1084,7 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
     def cinemas_btn_search_clicked(self):
         self.label_information.setText('')
         search_phrase = self.cinemas_enter_search_phrase.text().strip()
-        query = f"""SELECT cinemas.name, cinemas.address, cinemahalls.name FROM cinemas 
+        query = f"""SELECT cinemas.name, cinemahalls.name FROM cinemas 
                              JOIN cinemahalls ON cinemas.id = cinemahalls.cinema_id 
                                     WHERE cinemas.name LIKE '%{search_phrase}%'"""
         try:
@@ -1216,7 +1217,9 @@ class TicketsSystemMainWindow(Ui_MainWindow, QMainWindow):
         self.sessions_tab_cinema_selector.addItems(sorted([x[0] for x in cinemas]))
 
     def cinemas_btn_add_cinema_clicked(self):
-        pass
+        self.new_window = NewCinemaFormWindow(self)
+        self.new_window.show()
+        self.hide()
 
     def closeEvent(self, a0: QtGui.QCloseEvent):
         if self.database_connection is not None:
@@ -1330,6 +1333,94 @@ class CreateTicketsSystemWindow(QWidget):
         Form.setWindowTitle(_translate("Form", "Новая билетная система"))
         self.label.setText(_translate("Form", "Введите название новой системы:"))
         self.btn.setText(_translate("Form", "Далее"))
+
+
+class NewCinemaFormWindow(QWidget):
+    def __init__(self, main_window):
+        super(NewCinemaFormWindow, self).__init__()
+        self.main_window = main_window
+        self.setupUi(self)
+        self.label_information.setMaximumSize(100, 20)
+        self.label.setMaximumSize(200, 20)
+
+    def load_cinemahalls(self):
+        query = """SELECT name FROM cinemahalls"""
+        try:
+            result = list(self.main_window.database_cursor.execute(query).fetchall())
+            self.main_window.fill_table_from_db_result(self.new_cinema_cinemahalls_table, result)
+        except Exception:
+            pass
+
+    def setupUi(self, Form):
+        Form.setObjectName("Form")
+        Form.resize(500, 472)
+        self.verticalLayout_2 = QtWidgets.QVBoxLayout(Form)
+        self.verticalLayout_2.setObjectName("verticalLayout_2")
+        self.horizontalLayout = QtWidgets.QHBoxLayout()
+        self.horizontalLayout.setObjectName("horizontalLayout")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.label = QtWidgets.QLabel(Form)
+        self.label.setObjectName("label")
+        self.verticalLayout.addWidget(self.label)
+        self.new_cinema_name = QtWidgets.QLineEdit(Form)
+        self.new_cinema_name.setObjectName("new_cinema_name")
+        self.verticalLayout.addWidget(self.new_cinema_name)
+        self.horizontalLayout.addLayout(self.verticalLayout)
+        self.btn_cinema_add = QtWidgets.QPushButton(Form)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Maximum,
+                                           QtWidgets.QSizePolicy.Maximum)
+        sizePolicy.setHorizontalStretch(0)
+        sizePolicy.setVerticalStretch(0)
+        sizePolicy.setHeightForWidth(self.btn_cinema_add.sizePolicy().hasHeightForWidth())
+        self.btn_cinema_add.setSizePolicy(sizePolicy)
+        self.btn_cinema_add.setObjectName("btn_cinema_add")
+        self.horizontalLayout.addWidget(self.btn_cinema_add)
+        self.verticalLayout_2.addLayout(self.horizontalLayout)
+        self.horizontalLayout_2 = QtWidgets.QHBoxLayout()
+        self.horizontalLayout_2.setObjectName("horizontalLayout_2")
+        self.verticalLayout_2.addLayout(self.horizontalLayout_2)
+        self.new_cinema_cinemahalls_table = QtWidgets.QTableWidget(Form)
+        self.new_cinema_cinemahalls_table.setObjectName("new_cinema_cinemahalls_table")
+        self.new_cinema_cinemahalls_table.setColumnCount(3)
+        self.new_cinema_cinemahalls_table.setRowCount(4)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setVerticalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setVerticalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setVerticalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setVerticalHeaderItem(3, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setHorizontalHeaderItem(0, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setHorizontalHeaderItem(1, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setHorizontalHeaderItem(2, item)
+        item = QtWidgets.QTableWidgetItem()
+        self.new_cinema_cinemahalls_table.setItem(0, 0, item)
+        self.new_cinema_cinemahalls_table.verticalHeader().setVisible(False)
+        self.verticalLayout_2.addWidget(self.new_cinema_cinemahalls_table)
+        self.label_information = QtWidgets.QLabel(Form)
+        self.label_information.setObjectName("label_information")
+        self.verticalLayout_2.addWidget(self.label_information)
+
+        self.retranslateUi(Form)
+        QtCore.QMetaObject.connectSlotsByName(Form)
+
+    def retranslateUi(self, Form):
+        _translate = QtCore.QCoreApplication.translate
+        Form.setWindowTitle(_translate("Form", "Новый кинотеатр"))
+        self.label.setText(_translate("Form", "Название кинотеатра"))
+        self.btn_cinema_add.setText(_translate("Form", "Добавить"))
+        self.new_cinema_cinemahalls_table.setSortingEnabled(True)
+        self.label_information.setText(_translate("Form", "TextLabel"))
+
+
+    def closeEvent(self, a0: QtGui.QCloseEvent) -> None:
+        self.main_window.show()
+        self.close()
 
 
 if __name__ == '__main__':
