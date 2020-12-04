@@ -8,6 +8,7 @@ import datetime as dt
 
 EXTENSION = '.sqlite3'
 
+print()
 
 class TicketsSystemMainWindow(QMainWindow):
     def __init__(self, database_file=None):
